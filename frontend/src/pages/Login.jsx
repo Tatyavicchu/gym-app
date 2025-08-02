@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../utils/api';
+import API from '../utils/api'; // Use centralized API instance
 import { useAuth } from './AuthContext';
 
-const Register = () => {
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'member' });
+const Login = () => {
+  const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -15,71 +15,64 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await API.post('/auth/register', form);
+      // No need for /api prefix; api.js already includes it
+      const res = await API.post('/auth/login', {
+        email: form.email,
+        password: form.password
+      });
 
-      // Save token + user in context and localStorage
-      localStorage.setItem('token', data.token);
-      login(data.user);
+      if (res.data.token && res.data.user) {
+        login(res.data.user);
+        localStorage.setItem('token', res.data.token);
 
-      // Redirect based on role
-      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+        if (res.data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        alert('Invalid login response');
+      }
     } catch (err) {
-      console.error('Registration failed:', err);
-      alert(err.response?.data?.message || 'Registration failed');
+      console.error('Login failed:', err);
+      alert('Login failed. Check email or password.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col justify-center items-center px-4">
-      <h1 className="text-2xl font-bold mb-6">Register</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-sm">
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-          className="w-full p-2 bg-white/10 rounded text-white"
-        />
+    <div className="min-h-screen bg-gradient-to-br from-black to-gray-900 text-white flex flex-col justify-center items-center px-4">
+      <h1 className="text-2xl font-bold mb-6">Login</h1>
+      <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-sm bg-white/10 p-6 rounded-xl backdrop-blur">
         <input
           name="email"
           type="email"
+          placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          placeholder="Email"
           required
-          className="w-full p-2 bg-white/10 rounded text-white"
+          className="w-full p-2 bg-black/30 rounded text-white"
         />
         <input
           name="password"
           type="password"
+          placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          placeholder="Password"
           required
-          className="w-full p-2 bg-white/10 rounded text-white"
+          className="w-full p-2 bg-black/30 rounded text-white"
         />
-        <select
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="w-full p-2 bg-white/10 rounded text-white"
-        >
-          <option value="member">Member</option>
-          <option value="admin">Admin</option>
-        </select>
         <button type="submit" className="w-full p-2 bg-blue-500 rounded font-bold">
-          Register
+          Login
         </button>
       </form>
       <p className="mt-4 text-sm">
-        Already have an account?{' '}
-        <span onClick={() => navigate('/login')} className="text-blue-400 cursor-pointer">
-          Login
+        Don't have an account?{' '}
+        <span onClick={() => navigate('/register')} className="text-blue-400 cursor-pointer">
+          Register
         </span>
       </p>
     </div>
   );
 };
 
-export default Register;
+export default Login;
