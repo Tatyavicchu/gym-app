@@ -11,21 +11,19 @@ connectDB();
 
 const app = express();
 
-// Allowed Origins (Frontend URLs)
+// Allowed origins
 const allowedOrigins = [
   'https://gym-app-wine-six.vercel.app',
   'https://gym-gygh37293-mohit-bhandaris-projects-7425abde.vercel.app',
   'http://localhost:5173'
 ];
 
-// Configure CORS
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
+  origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed for this origin'));
+      callback(new Error('CORS not allowed'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -33,23 +31,16 @@ app.use(cors({
   credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
-// Middleware
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', adminRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/attendance', attendanceRoutes);
 
-// Health check route
 app.get('/', (req, res) => {
   res.send('API Running...');
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
