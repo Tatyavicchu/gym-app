@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Membership = () => {
-  const navigate = useNavigate(); // ✅ Move this inside the component
+  const navigate = useNavigate(); 
 
   const [plan, setPlan] = useState({
     name: '3 Month Premium',

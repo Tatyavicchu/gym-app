@@ -6,27 +6,31 @@ import { useAuth } from './AuthContext'; // Make sure the path is correct
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ Get login method from context
+  const { login } = useAuth();
+
+ 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // ✅ prevent form refresh
+    e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email: form.email,
         password: form.password
       });
 
       if (res.data.token && res.data.user) {
-        login(res.data.user); // ✅ save user in context + localStorage
-        localStorage.setItem('token', res.data.token); // ✅ save token
+        login(res.data.user);
+        localStorage.setItem('token', res.data.token);
+
         if (res.data.user.role === 'admin') {
           navigate('/admin');
         } else {
-        navigate('/dashboard');
+          navigate('/dashboard');
         }
       } else {
         alert('Invalid login response');

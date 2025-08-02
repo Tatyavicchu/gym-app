@@ -13,6 +13,9 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // ✅ Use environment variable for API base URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (!user) navigate('/');
   }, [user]);
@@ -22,7 +25,7 @@ const Dashboard = () => {
     const fetchAttendance = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/attendance', {
+        const res = await fetch(`${API_BASE_URL}/api/attendance`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -39,13 +42,13 @@ const Dashboard = () => {
     };
 
     fetchAttendance();
-  }, []);
+  }, [API_BASE_URL]);
 
   // Mark today's attendance
   const markAttendance = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/attendance', {
+      const res = await fetch(`${API_BASE_URL}/api/attendance`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
