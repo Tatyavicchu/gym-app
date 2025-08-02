@@ -11,8 +11,7 @@ connectDB();
 const app = express();
 
 const allowedOrigins = [
-  'http://localhost:5173',           // React frontend (local dev)
-  'https://your-frontend.vercel.app' // Replace with actual deployed URL
+  'https://gym-app-wine-six.vercel.app'
 ];
 
 app.use(cors({

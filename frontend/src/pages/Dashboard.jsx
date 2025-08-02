@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import bgImage from '../photos/homewall.jpeg';
 import PageLayout from '../components/PageLayout';
 import { useAuth } from './AuthContext';
+import API from '../utils/api'; // centralized API instance
 
 const Dashboard = () => {
   const [attendance, setAttendance] = useState([]);
@@ -13,9 +14,6 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ Use environment variable for API base URL
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
   useEffect(() => {
     if (!user) navigate('/');
   }, [user]);
@@ -24,15 +22,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/api/attendance`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error(`Failed: ${res.status}`);
-
-        const data = await res.json();
-        const normalized = (data.dates || data.attendance || []).map(dateStr =>
+        const res = await API.get('/attendance'); // auto baseURL + token
+        const normalized = (res.data.dates || res.data.attendance || []).map(dateStr =>
           new Date(dateStr).toDateString()
         );
         setAttendance(normalized);
@@ -42,24 +33,13 @@ const Dashboard = () => {
     };
 
     fetchAttendance();
-  }, [API_BASE_URL]);
+  }, []);
 
   // Mark today's attendance
   const markAttendance = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/api/attendance`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!res.ok) throw new Error(`Mark failed: ${res.status}`);
-
-      const data = await res.json();
-      const updated = (data.attendance || []).map(dateStr =>
+      const res = await API.post('/attendance'); // auto token
+      const updated = (res.data.attendance || []).map(dateStr =>
         new Date(dateStr).toDateString()
       );
       setAttendance(updated);

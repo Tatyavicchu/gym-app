@@ -11,11 +11,7 @@ const AdminComplaints = () => {
 
   const fetchComplaints = async () => {
     try {
-      const res = await API.get('/admin/complaints', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const res = await API.get('/admin/complaints'); // token auto-added
       setComplaints(res.data);
     } catch (err) {
       console.error('Failed to fetch complaints:', err);
@@ -26,11 +22,7 @@ const AdminComplaints = () => {
 
   const deleteComplaint = async (id) => {
     try {
-      await API.delete(`/admin/complaints/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      await API.delete(`/admin/complaints/${id}`);
       setComplaints((prev) => prev.filter((c) => c._id !== id));
     } catch (err) {
       console.error('Failed to delete complaint:', err);
