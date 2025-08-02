@@ -32,3 +32,4 @@ backend/node_modules
 frontend/dist
 frontend/build
 backend/build
+node_modules/
